@@ -1,0 +1,33 @@
+
+<h1>This is a github ranking app</h1>
+
+<p>
+    Available users are:
+</p>
+<ul>
+    <li *ngFor="let user of availableUsers" (click)="updateUser(user.login)">{{user.login}}</li>
+</ul>
+
+<label htmlFor="username">root username 
+    <input type="text" 
+        placeholder="here" 
+        [(ngModel)]="username" />
+</label>
+<br />      
+
+<label htmlFor="levelsCheckbox">
+    <input type="checkbox" 
+        id="levelsCheckbox" 
+        [(ngModel)]="reportLevel" 
+        value="2" />  
+  2 levels report 
+</label>
+<br />
+<br />
+
+<app-report 
+    [rootUsername]="username"
+    [reportLevel]="reportLevel"
+></app-report>
+<br />
+

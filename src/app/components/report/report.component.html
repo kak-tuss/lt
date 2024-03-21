@@ -1,0 +1,32 @@
+<table class="report" *ngIf="reportData.length > 0">
+    <tr>
+        <th colspan="3">
+            {{rootUsername}}'s followers report
+            {{reportLevel ? 'level 2' : 'level 1'}}
+        </th>
+    </tr>
+    <tr>
+        <th (click)="sort('login')" 
+            [class]="getSortClass('login')"
+        >User</th>
+        <th (click)="sort('created_at')"
+        [class]="getSortClass('created_at')"
+        >Creation date</th>
+        <th *ngIf="!reportLevel" 
+        (click)="sort('followers')"
+        [class]="getSortClass('followers')"
+        >Followers</th>
+        <th *ngIf="reportLevel" 
+        (click)="sort('followersLevel2')"
+        [class]="getSortClass('followersLevel2')"
+        >Rank</th>
+    </tr>
+    <tr *ngFor="let user of reportData">
+        <td><a href="{{user.html_url}}" target="_blank"><img src="{{user.avatar_url}}" width="30" height="30" alt="User Avatar" /> {{user.login}}</a></td>
+        <td>{{user.created_at | date}}</td>
+        <td *ngIf="!reportLevel">{{user.followers}}</td>
+        <td *ngIf="reportLevel">{{user.followersLevel2}}</td>
+</table>
+<div class="report" *ngIf="reportData.length === 0">
+    <p>No data available</p>
+</div>
