@@ -1,9 +1,14 @@
+h1 {
+    text-align: center;
+}
+p {
+    text-align: center;
+}
 ul {
     margin: 0 0 15px;
     padding: 0;
     list-style: none;
     display: block;
-    border: 1px solid red;
     display: flex;
     flex-wrap: wrap;
     flex-direction: row;
@@ -17,14 +22,34 @@ ul li {
     padding: 3px 6px;
     margin: 0 7px 7px 0;
 }
-label {
-    display: block;
-    margin: 0 0 3px;
-}
-label input[type=text] {
-    display: block;
-    border: 2px solid #000000;
-    margin: 3px 0 0;
-    padding: 5px;
-    border-radius: 5px;
+form {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: center;
+    label {
+        display: block;
+        margin: 0 10px 3px;
+    }
+    label input[name="username"] {
+        display: block;
+        border: 2px solid #000000;
+        margin: 3px 0 0;
+        padding: 5px;
+        border-radius: 5px;
+        height: 50px;
+        font-size: 36px;
+    }
+    label input[name="level"] {
+        width: 50px;
+        height: 50px;
+        line-height: 50px;
+        text-align: center;
+        font-size: 36px;
+        display: block;
+        border: 2px solid #000000;
+        margin: 3px 0 0;
+        padding: 5px;
+        border-radius: 5px;
+    }
 }

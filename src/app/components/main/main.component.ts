@@ -9,7 +9,7 @@ import { usersMock } from 'src/app/mocks/users-response';
 })
 export class MainComponent {
   username: string = 'octocat';
-  reportLevel: boolean = false;
+  reportLevel: number = 1;
   showReport: boolean = false;
   availableUsers: User[] = usersMock
 
