@@ -28,25 +28,28 @@ export class UsersService {
   getFollowersWithBFSRatingSorted(
     username: string, 
     level: number, 
-    by: keyof UserExtended, 
-    direction: boolean)
+    by: keyof UserExtended | null = null, 
+    direction: boolean = true)
     : Observable<UserExtended[]> 
   {
-    const followers = this.getUserFollowers(username);
-    return of(followers
-      .sort((a: UserExtended, b: UserExtended) => {
-        if ((a[by] ?? '') > (b[by] ?? '')) return direction ? 1 : -1;
-        if ((a[by] ?? '') < (b[by] ?? '')) return direction ? -1 : 1;
-        return 0;
-      })
+    const followers = this.getUserFollowers(username)
       .map((follower: User) => {
         const user = this.getUser(follower.login);
         if (!user) {
           return follower as UserExtended;
         }
         user.rank = this.getDeepRatingBFS(follower.login, level);
-        return user;
-      }));
+        return user;        
+      });
+    const sortedFollowers = followers;
+    if (by !== null) {
+      sortedFollowers.sort((a: UserExtended, b: UserExtended) => {
+        if ((a[by] ?? '') > (b[by] ?? '')) return direction ? 1 : -1;
+        if ((a[by] ?? '') < (b[by] ?? '')) return direction ? -1 : 1;
+        return 0;
+      });
+    };
+    return of(sortedFollowers);
   }
 
   getDeepRatingBFS(username: string, levels: number = 1): number {

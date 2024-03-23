@@ -9,12 +9,12 @@ import { UsersService } from 'src/app/services/users.service';
   styleUrls: ['./report.component.scss']
 })
 
-export class ReportComponent {
+export class ReportComponent implements OnChanges {
   @Input() rootUsername: string = '';
   @Input() reportLevel: number = 1;
 
   reportCurrentPage$: Observable<UserExtended[]> = new Observable<UserExtended[]>();
-  page$ = new BehaviorSubject<number>(1);
+  pageChange$ = new BehaviorSubject<number>(1);
   pageSize: number = 2;
   currentPage: number = 1;
   totalPages: number = 0;
@@ -22,14 +22,22 @@ export class ReportComponent {
   currentSort: keyof UserExtended | null = null;
   currentDirection: boolean = true;
 
-
   constructor(private usersService: UsersService) {
-    this.reportCurrentPage$ = this.page$.pipe(
-      switchMap((page: number) => this.usersService
-      .getFollowersWithBFSRatingSorted(this.rootUsername, 
-                                       this.reportLevel, 
-                                       this.currentSort ?? 'login',
-                                       this.currentDirection)),
+  }
+
+  ngOnChanges(): void {
+    this.getReport();
+  }
+
+  getReport(): void {
+    this.reportCurrentPage$ = this.pageChange$.pipe(
+      tap((page) => this.currentPage = page),
+      switchMap(() => this.usersService
+                                      .getFollowersWithBFSRatingSorted(
+                                        this.rootUsername, 
+                                        this.reportLevel, 
+                                        this.currentSort,
+                                        this.currentDirection)),
       tap((data) => this.setTotalPages(data.length)),
       map((data) => this.getOnePage(data))
     );
@@ -46,8 +54,7 @@ export class ReportComponent {
   }
 
   pageChange(page: number): void {
-    this.currentPage = page;
-    this.page$.next(this.currentPage);
+    this.pageChange$.next(page);
   }
   sort(by: keyof UserExtended): void {
     if (this.currentSort === by) {
