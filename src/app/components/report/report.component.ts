@@ -31,15 +31,15 @@ export class ReportComponent implements OnChanges {
 
   getReport(): void {
     this.reportCurrentPage$ = this.pageChange$.pipe(
-      tap((page) => this.currentPage = page),
+      tap((page: number) => this.currentPage = page),
       switchMap(() => this.usersService
                                       .getFollowersWithBFSRatingSorted(
                                         this.rootUsername, 
                                         this.reportLevel, 
                                         this.currentSort,
                                         this.currentDirection)),
-      tap((data) => this.setTotalPages(data.length)),
-      map((data) => this.getOnePage(data))
+      tap((data: UserExtended[]) => this.setTotalPages(data.length)),
+      map((data: UserExtended[]) => this.getOnePage(data))
     );
   }
 
