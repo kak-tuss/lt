@@ -31,7 +31,7 @@ export interface UserExtended extends User {
     "public_repos"?: number;
     "public_gists"?: number;
     "followers"?: number;
-    "followersLevel2"?: number;
+    "rank"?: number;
     "following"?: number;
     "created_at"?: string;
     "updated_at"?: string;

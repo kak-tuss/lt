@@ -2,77 +2,69 @@ import { Injectable } from '@angular/core';
 import { usersMock } from '../mocks/users-response';
 import { followersMock } from '../mocks/followers-response';
 import { User, UserExtended } from '../interfaces/user.interface';
+import { Observable, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UsersService {
   private usersStateMap: Map<string, UserExtended> = new Map<string, UserExtended>();
-
+  totalUsers: number = 0;
   constructor() { 
     usersMock.map((user: UserExtended) => {
       this.usersStateMap.set(user.login, user);
     });
+    this.totalUsers = usersMock.length;
   }
 
   getUser(username: string): UserExtended | undefined {
     return this.usersStateMap.get(username) || undefined;
   }
 
-  getFollowers(username: string): User[] | [] {
+  getUserFollowers(username: string): User[] | [] {
      return (followersMock as any)[username] || [];
   }
 
-  getExtendedFollowers(username: string): UserExtended[] | [] {
-    let followers: User[] = this.getFollowers(username);
-    return followers.map((follower: User) => {
-      return this.getUser(follower.login) || follower as UserExtended;
-    });
-  }
-
-  getFollowersWithRating(username: string): UserExtended[] {
-    const followers = this.getFollowers(username);
-    return followers.map((follower: User) => {
-      const user = this.getUser(follower.login);
-      if (!user) {
-        return follower as UserExtended;
-      }
-      user.followersLevel2 = this.getRating(follower.login);
-      return user;
-    });
-  }
-
-  getRating(username: string): number {
-    const user = this.getUser(username);
-    if (!user) {
-      console.log('User not found');
-      return 0;
-    }
-
-    if (user.followersLevel2 !== undefined) { 
-      console.log('Got rating for', username, 'from state!');
-      return user.followersLevel2;
-    }
-    console.log('Calculating rating for', username, user.followersLevel2);
-
-    const followersMap = new Map<string, number>();
-
-    const followers = this.getFollowers(username);
-
-    followers.map((follower: User) => {
-      if (!followersMap.has(follower.login)) {
-        followersMap.set(follower.login, 1);
-      }
-      const secondLevelFollowers = this.getFollowers(follower.login);
-      secondLevelFollowers.map((secondLevelFollower: User) => {
-        if (!followersMap.has(secondLevelFollower.login)) {
-          followersMap.set(secondLevelFollower.login, 1);
+  getFollowersWithBFSRatingSorted(
+    username: string, 
+    level: number, 
+    by: keyof UserExtended, 
+    direction: boolean)
+    : Observable<UserExtended[]> 
+  {
+    const followers = this.getUserFollowers(username);
+    return of(followers
+      .sort((a: UserExtended, b: UserExtended) => {
+        if ((a[by] ?? '') > (b[by] ?? '')) return direction ? 1 : -1;
+        if ((a[by] ?? '') < (b[by] ?? '')) return direction ? -1 : 1;
+        return 0;
+      })
+      .map((follower: User) => {
+        const user = this.getUser(follower.login);
+        if (!user) {
+          return follower as UserExtended;
         }
-      });
-    });
+        user.rank = this.getDeepRatingBFS(follower.login, level);
+        return user;
+      }));
+  }
 
-    user.followersLevel2 = followersMap.size;
-    this.usersStateMap.set(username, user);
-    return user.followersLevel2;
+  getDeepRatingBFS(username: string, levels: number = 1): number {
+    let list: Set<string> = new Set();
+
+    const getFollowers = (user: string, level: number): void => {
+      if (level === 0) return;
+      let userFollowers: string[] = this.getUserFollowers(user)
+                        .map((follower: User) => follower.login);
+      if (!userFollowers || userFollowers.length === 0) return;
+
+      userFollowers.forEach((follower: string) => {
+        list.add(follower);
+        getFollowers(follower, level - 1);
+      });
+    }
+
+    getFollowers(username, levels);
+    return list.size;
   }
 }

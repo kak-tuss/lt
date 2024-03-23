@@ -1,8 +1,8 @@
-<table class="report" *ngIf="reportCurrentPage.length > 0">
+<table class="report" *ngIf="(reportCurrentPage$ | async)">
     <tr>
         <th colspan="3">
             {{rootUsername}}'s followers report
-            {{reportLevel ? 'level 2' : 'level 1'}}
+            {{reportLevel}}
         </th>
     </tr>
     <tr>
@@ -10,31 +10,29 @@
             [class]="getSortClass('login')"
         >User</th>
         <th (click)="sort('created_at')"
-        [class]="getSortClass('created_at')"
+            [class]="getSortClass('created_at')"
         >Creation date</th>
-        <th *ngIf="!reportLevel" 
-        (click)="sort('followers')"
-        [class]="getSortClass('followers')"
-        >Followers</th>
-        <th *ngIf="reportLevel" 
-        (click)="sort('followersLevel2')"
-        [class]="getSortClass('followersLevel2')"
+        <th (click)="sort('rank')"
+            [class]="getSortClass('rank')"
         >Rank</th>
     </tr>
-    <tr *ngFor="let user of reportCurrentPage">
-        <td><a href="{{user.html_url}}" target="_blank"><img src="{{user.avatar_url}}" width="30" height="30" alt="User Avatar" /> {{user.login}}</a></td>
+    <tr *ngFor="let user of reportCurrentPage$ | async">
+        <td>
+            <a href="{{user.html_url}}" target="_blank">
+                <img src="{{user.avatar_url}}" width="30" height="30" alt="User Avatar" />
+            </a>&nbsp;
+            <a href="{{user.html_url}}" target="_blank">{{user.login}}</a></td>
         <td>{{user.created_at | date}}</td>
-        <td *ngIf="!reportLevel">{{user.followers}}</td>
-        <td *ngIf="reportLevel">{{user.followersLevel2}}</td>
+        <td *ngIf="reportLevel">{{user.rank}}</td>
     </tr>
     <tr>
         <td colspan="3">
             <div class="pagination">
-                <button [disabled]="currentPage === 1" (click)="previousPage()">
+                <button [disabled]="currentPage === 1" (click)="pageChange(currentPage - 1)">
                     &#60;
                 </button>
                 <span>{{currentPage}} / {{totalPages}}</span>
-                <button [disabled]="currentPage === totalPages" (click)="nextPage()">
+                <button [disabled]="currentPage === totalPages" (click)="pageChange(currentPage + 1)">
                     &#62;    
                 </button>
             </div>
@@ -42,4 +40,6 @@
     </tr>
 </table>
 
-
+<div class="report"  *ngIf="!(reportCurrentPage$ | async)">
+    No data available for this user
+</div>

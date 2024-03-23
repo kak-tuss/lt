@@ -1,7 +1,11 @@
 /* You can add global styles to this file, and also import other style files */
+html, body {
+    height: 100%;
+}
 body {
     width: 35%;
     min-width: 500px;
-    // margin: 0 auto;
+    margin: 0 auto;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(to bottom, #ffffff, #7bbcd4);
 }

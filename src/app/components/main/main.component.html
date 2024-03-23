@@ -16,11 +16,12 @@
 
     <label htmlFor="level">
         level
-        <input type="text"
+        <input type="number"
             name="level"
             default="1"
             [(ngModel)]="reportLevel" 
-            value="1" />
+            oninput="if(value < 1) value = 1"
+            />
     </label>
 </form>
 
